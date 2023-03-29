@@ -48,6 +48,10 @@ jobs:
           echo "release_timestamp=$(date '+%Y-%m-%d @ %H:%M')" >> $GITHUB_ENV
           echo "release_timestamp_terse=$(date '+%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
           echo "release_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Collect release metadata, part 2
+        if: github.ref == 'refs/heads/master' && ${{ inputs.pattern-to-release }} != ''
+        id: collect_release_metadata_2
+        run: |
           echo "release_file=$(ls target/${{ inputs.pattern-to-release }})" >> $GITHUB_ENV
       - name: Create release
         if: github.ref == 'refs/heads/master'
