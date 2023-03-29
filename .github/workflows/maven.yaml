@@ -39,22 +39,22 @@ jobs:
       - name: Run Maven
         run: TZ=Europe/Berlin xvfb-run mvn clean verify
       - name: Run script after Maven build
-        if: ${{ inputs.script-after-maven-build }} != ''
+        if: ${{ inputs.script-after-maven-build != '' }}
         run: ${{ inputs.script-after-maven-build }}
       - name: Collect release metadata
-        if: github.ref == 'refs/heads/master'
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: collect_release_metadata
         run: |
           echo "release_timestamp=$(date '+%Y-%m-%d @ %H:%M')" >> $GITHUB_ENV
           echo "release_timestamp_terse=$(date '+%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
           echo "release_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Collect release metadata, part 2
-        if: github.ref == 'refs/heads/master' && ${{ inputs.pattern-to-release }} != ''
+        if: ${{ github.ref == 'refs/heads/master' && inputs.pattern-to-release != '' }}
         id: collect_release_metadata_2
         run: |
           echo "release_file=$(ls target/${{ inputs.pattern-to-release }})" >> $GITHUB_ENV
       - name: Create release
-        if: github.ref == 'refs/heads/master'
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
