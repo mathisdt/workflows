@@ -12,7 +12,6 @@ on:
       pattern-to-release:
         required: false
         type: string
-    secrets: inherit
 
 jobs:
   release:
