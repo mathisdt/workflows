@@ -3,7 +3,7 @@ name: Build
 on:
   workflow_call:
     inputs:
-      script-after-mvn-build:
+      script-after-maven-build:
         required: false
         type: string
       files-to-release:
@@ -39,8 +39,8 @@ jobs:
       - name: Run Maven
         run: TZ=Europe/Berlin xvfb-run mvn clean verify
       - name: Run script after Maven build
-        if: ${{ inputs.script-after-mvn-build }} != ''
-        run: ${{ inputs.script-after-mvn-build }}
+        if: ${{ inputs.script-after-maven-build }} != ''
+        run: ${{ inputs.script-after-maven-build }}
       - name: Collect release metadata
         if: github.ref == 'refs/heads/master'
         id: collect_release_metadata
