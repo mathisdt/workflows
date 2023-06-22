@@ -29,6 +29,9 @@ jobs:
           distribution: 'temurin'
           java-version: 17
           check-latest: true
+      - name: Install necessary packages
+        run: |
+          sudo apt-get -y install ttf-mscorefonts-installer
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
