@@ -31,6 +31,8 @@ jobs:
           check-latest: true
       - name: Install necessary packages
         run: |
+          echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
+          echo ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note | sudo debconf-set-selections
           sudo apt-get -y install ttf-mscorefonts-installer
       - name: Set up Maven cache
         uses: actions/cache@v3
