@@ -3,6 +3,9 @@ name: Build
 on:
   workflow_call:
     inputs:
+      additional-maven-parameters:
+        required: false
+        type: string
       script-after-maven-build:
         required: false
         type: string
@@ -42,7 +45,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Run Maven
-        run: TZ=Europe/Berlin xvfb-run mvn clean verify
+        run: TZ=Europe/Berlin xvfb-run mvn clean verify ${{ inputs.additional-maven-parameters }}
       - name: Run script after Maven build
         if: ${{ inputs.script-after-maven-build != '' }}
         run: ${{ inputs.script-after-maven-build }}
