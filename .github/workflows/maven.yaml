@@ -46,6 +46,14 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Run Maven
         run: TZ=Europe/Berlin xvfb-run mvn clean verify ${{ inputs.additional-maven-parameters }}
+      - uses: dorny/test-reporter@v1.6.0
+        if: success() || failure()
+        with:
+          artifact: test-results
+          name: Generate Test Report
+          path: '**/TEST-*.xml'
+          reporter: java-junit
+          fail-on-error: 'false'
       - name: Run script after Maven build
         if: ${{ inputs.script-after-maven-build != '' }}
         run: ${{ inputs.script-after-maven-build }}
