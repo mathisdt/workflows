@@ -39,14 +39,12 @@ jobs:
         run: ./gradlew clean test
       - name: Assemble
         run: ./gradlew assemble
-      - uses: dorny/test-reporter@v1.6.0
+      - name: Generate Test Report
+        uses: mikepenz/action-junit-report@v4
         if: success() || failure()
         with:
-          artifact: test-results
-          name: Generate Test Report
-          path: '**/TEST-*.xml'
-          reporter: java-junit
-          fail-on-error: 'false'
+          report_paths: '**/TEST-*.xml'
+          fail_on_failure: 'false'
       - name: Cleanup Gradle cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
