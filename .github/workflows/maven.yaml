@@ -38,7 +38,7 @@ jobs:
           echo ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note | sudo debconf-set-selections
           sudo apt-get -y install ttf-mscorefonts-installer
       - name: Set up Maven cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}

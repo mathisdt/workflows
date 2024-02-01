@@ -26,7 +26,7 @@ jobs:
           java-version: 20    # JDK 21 is still unsupported by Kotlin
           check-latest: true
       - name: Set up Gradle cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: gradle-cache
         with:
           path: |
