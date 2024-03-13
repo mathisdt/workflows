@@ -45,7 +45,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Run Maven
-        run: TZ=Europe/Berlin xvfb-run mvn clean verify ${{ inputs.additional-maven-parameters }}
+        run: TZ=Europe/Berlin xvfb-run mvn clean verify -U --no-transfer-progress ${{ inputs.additional-maven-parameters }}
       - name: Generate Test Report
         uses: mikepenz/action-junit-report@v4
         if: success() || failure()
