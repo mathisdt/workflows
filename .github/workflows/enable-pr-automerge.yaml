@@ -1,0 +1,24 @@
+name: Enable-PR-AutoMerge
+
+on:
+  workflow_call:
+
+jobs:
+  enable-pr-automerge:
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'automatic-merge')
+      && (
+        contains(github.event.pull_request.labels.*.name, 'minor')
+        || contains(github.event.pull_request.labels.*.name, 'patch')
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Enable auto-merge
+        run: |
+          gh pr merge --merge --auto "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
