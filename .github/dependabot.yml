@@ -1,12 +1,12 @@
 version: 2
 updates:
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: monthly
-    groups:
-      minor-and-patch-version-updates:
-        update-types:
-        - "minor"
-        - "patch"
+      interval: "daily"
+      time: "04:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 100
+    labels:
+      - "dependencies"
+      - "automatic-merge"
