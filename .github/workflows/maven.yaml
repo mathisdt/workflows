@@ -15,6 +15,10 @@ on:
       pattern-to-release:
         required: false
         type: string
+      java-version:
+        required: false
+        type: string
+        default: '21'
 
 jobs:
   release:
@@ -30,7 +34,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: {{ java-version }}
           check-latest: true
       - name: Install necessary packages
         run: |
