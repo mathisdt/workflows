@@ -11,6 +11,10 @@ on:
         required: false
         type: boolean
         default: false
+      pypi-repository:
+        required: false
+        type: string
+        default: testpypi
 
 jobs:
   build:
@@ -40,7 +44,7 @@ jobs:
         run: |
           pip3 install twine
           # TODO remove "--repository testpypi" after testing ===> and reset version to "1" in pyproject.toml <===
-          python3 -m twine upload --repository testpypi --verbose dist/*
+          python3 -m twine upload --repository ${{ inputs.pypi-repository }} --verbose dist/*
       - name: Increase version number
         if: ${{ success() }}
         run: |
