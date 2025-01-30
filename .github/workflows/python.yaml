@@ -1,0 +1,61 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: '3.13'
+      upload-to-pypi:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Display branch name
+        run: |
+          echo "current branch: $GITHUB_REF"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+      - name: Build package locally
+        run: |
+          python3 -m build
+      - name: Upload package to PyPI
+        if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && inputs.upload-to-pypi }}
+        run: |
+          # TODO remove "--repository testpypi" after testing ===> and reset version to "1" in pyproject.toml <===
+          python3 -m twine upload --repository testpypi --verbose dist/*
+      - name: Increase version number
+        if: ${{ success() }}
+        run: |
+          pip3 install tomli tomli-w
+          python3 <<EOF
+          import tomli, tomli_w
+          with open("pyproject.toml", "rb") as f:
+            data = tomli.load(f)
+          print(f'previous version: {data["project"]["version"]}')
+          data["project"]["version"] = str(int(data["project"]["version"])+1)
+          print(f'updated version:  {data["project"]["version"]}')
+          with open("pyproject.toml", "wb") as f:
+            tomli_w.dump(data, f)
+          EOF
+      - name: Commit and push increased version
+        if: ${{ success() }}
+        run: |
+          git config --global user.name 'Github Actions'
+          git config --global user.email 'mathisdt@users.noreply.github.com'
+          git add pyproject.toml
+          git commit -m "update version number [skip actions]"
+          git push
