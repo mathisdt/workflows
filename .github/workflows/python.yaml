@@ -36,7 +36,7 @@ jobs:
       - name: Upload package to PyPI
         if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && inputs.upload-to-pypi }}
         env:
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
           pip3 install twine
           # TODO remove "--repository testpypi" after testing ===> and reset version to "1" in pyproject.toml <===
