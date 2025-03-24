@@ -1,0 +1,98 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      additional-maven-parameters:
+        required: false
+        type: string
+      script-after-maven-build:
+        required: false
+        type: string
+      files-to-release:
+        required: false
+        type: string
+      pattern-to-release:
+        required: false
+        type: string
+      java-version:
+        required: false
+        type: string
+        default: '21'
+      node-version:
+        required: false
+        type: string
+        default: '>=22.14.0'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Display branch name
+        run: |
+          echo "current branch: $GITHUB_REF"
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ inputs.java-version }}
+          check-latest: true
+      - name: Install necessary packages
+        run: |
+          echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
+          echo ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note | sudo debconf-set-selections
+          sudo apt-get -y install ttf-mscorefonts-installer
+      - name: Set up Maven cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Build frontend
+        run: |
+          cd src/frontend
+          npm run build
+          cd ../..
+      - name: Copy frontend files
+        run: cp -rv src/frontend/dist/frontend/browser/* src/resources/static/
+      - name: Run Maven
+        run: TZ=Europe/Berlin xvfb-run mvn clean verify -U --no-transfer-progress ${{ inputs.additional-maven-parameters }}
+      - name: Generate Test Report
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure()
+        with:
+          report_paths: '**/TEST-*.xml'
+          fail_on_failure: 'false'
+      - name: Run script after Maven build
+        if: ${{ inputs.script-after-maven-build != '' }}
+        run: ${{ inputs.script-after-maven-build }}
+      - name: Collect release metadata
+        if: ${{ github.ref == 'refs/heads/master' }}
+        id: collect_release_metadata
+        run: |
+          echo "release_timestamp=$(date '+%Y-%m-%d @ %H:%M')" >> $GITHUB_ENV
+          echo "release_timestamp_terse=$(date '+%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
+          echo "release_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Collect release metadata, part 2
+        if: ${{ github.ref == 'refs/heads/master' && inputs.pattern-to-release != '' }}
+        id: collect_release_metadata_2
+        run: |
+          echo "release_file=$(ls target/${{ inputs.pattern-to-release }})" >> $GITHUB_ENV
+      - name: Create release
+        if: ${{ github.ref == 'refs/heads/master' }}
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ env.release_timestamp }}
+          body: built from commit ${{ env.release_hash }}
+          tag_name: release-${{ env.release_timestamp_terse }}-${{ env.release_hash }}
+          files: ${{ inputs.files-to-release || env.release_file }}
+          token: ${{ secrets.GITHUB_TOKEN }}
