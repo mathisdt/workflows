@@ -63,7 +63,7 @@ jobs:
           npm run build
           cd ../..
       - name: Copy frontend files
-        run: cp -rv src/frontend/dist/frontend/browser/* src/resources/static/
+        run: cp -rv src/frontend/dist/frontend/browser/* src/main/resources/static/
       - name: Run Maven
         run: TZ=Europe/Berlin xvfb-run mvn clean verify -U --no-transfer-progress ${{ inputs.additional-maven-parameters }}
       - name: Generate Test Report
