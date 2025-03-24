@@ -59,6 +59,7 @@ jobs:
       - name: Build frontend
         run: |
           cd src/frontend
+          npm install
           npm run build
           cd ../..
       - name: Copy frontend files
