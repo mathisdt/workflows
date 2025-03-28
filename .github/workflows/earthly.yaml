@@ -31,7 +31,7 @@ jobs:
         if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
         run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
       - name: Run earthly
-        run: earthly --ci +build
+        run: earthly --strict +build
       - name: Generate test report
         uses: mikepenz/action-junit-report@v5
         if: ${{ inputs.junit-report-path != '' }}
