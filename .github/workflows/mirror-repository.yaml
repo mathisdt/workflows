@@ -1,0 +1,23 @@
+name: Mirror repository
+
+on:
+  workflow_call:
+    inputs:
+      target-repo:
+        required: true
+        type: string
+
+
+jobs:
+  do-mirror:
+    runs-on: ubuntu-latest
+    name: to ${{ inputs.target-repo }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: yesolutions/mirror-action@v0.7.0
+        with:
+          REMOTE: ${{ inputs.target-repo }}
+          GIT_SSH_PRIVATE_KEY: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
+          GIT_SSH_NO_VERIFY_HOST: "true"
