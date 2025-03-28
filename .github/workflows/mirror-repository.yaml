@@ -11,7 +11,6 @@ on:
 jobs:
   do-mirror:
     runs-on: ubuntu-latest
-    name: to ${{ inputs.target-repo }}
     steps:
       - uses: actions/checkout@v4
         with:
