@@ -36,7 +36,7 @@ jobs:
         if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
         run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
       - name: Run earthly
-        run: earthly --strict ${{ inputs.earthly-target }} --PATTERN_TO_RELEASE='${{ inputs.pattern-to-release }}' --GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        run: earthly --strict --push ${{ inputs.earthly-target }} --PATTERN_TO_RELEASE='${{ inputs.pattern-to-release }}' --GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
       - name: Generate test report
         uses: mikepenz/action-junit-report@v5
         if: ${{ inputs.junit-report-path != '' }}
