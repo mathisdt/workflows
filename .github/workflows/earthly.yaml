@@ -1,5 +1,4 @@
 name: build
-run-name: build commit with earthly
 
 on:
   workflow_call:
