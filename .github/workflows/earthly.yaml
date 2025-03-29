@@ -3,13 +3,18 @@ name: Build
 on:
   workflow_call:
     inputs:
+      earthly-target:
+        required: false
+        type: string
+        default: "+build-and-release-on-github"
+      pattern-to-release:
+        required: false
+        type: string
+        default: ""
       junit-report-path:
         required: false
         type: string
         default: '**/TEST-*.xml'
-      pattern-to-release:
-        required: false
-        type: string
 
 jobs:
   release:
@@ -31,32 +36,10 @@ jobs:
         if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
         run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
       - name: Run earthly
-        run: earthly --strict +build
+        run: earthly --strict ${{ inputs.earthly-target }} --PATTERN_TO_RELEASE='${{ inputs.pattern-to-release }}' --GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
       - name: Generate test report
         uses: mikepenz/action-junit-report@v5
         if: ${{ inputs.junit-report-path != '' }}
         with:
           report_paths: ${{ inputs.junit-report-path }}
           fail_on_failure: 'false'
-      - name: Collect release metadata
-        if: ${{ github.ref == 'refs/heads/master' }}
-        id: collect_release_metadata
-        run: |
-          echo "release_timestamp=$(date '+%Y-%m-%d @ %H:%M')" >> $GITHUB_ENV
-          echo "release_timestamp_terse=$(date '+%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
-          echo "release_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      - name: Collect release metadata, part 2
-        if: ${{ github.ref == 'refs/heads/master' && inputs.pattern-to-release != '' }}
-        id: collect_release_metadata_2
-        run: |
-          echo "release_file=$(ls target/${{ inputs.pattern-to-release }})" >> $GITHUB_ENV
-      - name: Create release
-        if: ${{ github.ref == 'refs/heads/master' }}
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: Release ${{ env.release_timestamp }}
-          body: built from commit ${{ env.release_hash }}
-          tag_name: release-${{ env.release_timestamp_terse }}-${{ env.release_hash }}
-          files: ${{ env.release_file }}
-          token: ${{ secrets.GITHUB_TOKEN }}
