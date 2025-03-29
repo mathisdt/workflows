@@ -36,4 +36,12 @@ jobs:
         if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
         run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
       - name: Run earthly
-        run: earthly --ci --push  ${{ inputs.earthly-target }} --PATTERN_TO_RELEASE='${{ inputs.pattern-to-release }}' --GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          export OTHER_ARGS=""
+          if [ "$PYPI_TOKEN" != "" ]; then
+            echo "adding PyPI token to args"
+            export OTHER_ARGS="$OTHER_ARGS --PYPI_TOKEN=$PYPI_TOKEN"
+          fi
+          earthly --ci --push  ${{ inputs.earthly-target }} --PATTERN_TO_RELEASE='${{ inputs.pattern-to-release }}' --GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} $OTHER_ARGS
