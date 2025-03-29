@@ -1,4 +1,4 @@
-name: build
+name: build with earthly
 
 on:
   workflow_call:
