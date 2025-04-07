@@ -17,9 +17,8 @@ on:
         default: '**/TEST-*.xml'
 
 jobs:
-  release:
+  build-with-earthly:
     runs-on: ubuntu-latest
-    name: Build
     env:
       FORCE_COLOR: 1
     steps:
