@@ -26,7 +26,7 @@ jobs:
     name: Build
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Display branch name
         run: |
           echo "current branch: $GITHUB_REF"
