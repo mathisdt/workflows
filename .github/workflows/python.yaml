@@ -24,7 +24,7 @@ jobs:
       contents: write
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Display branch name
         run: |
           echo "current branch: $GITHUB_REF"
